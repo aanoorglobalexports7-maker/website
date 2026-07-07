@@ -1,0 +1,97 @@
+.featured-onion-section {
+  background-color: var(--white);
+  overflow: hidden;
+}
+
+.interactive-field {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  overflow: hidden;
+  cursor: ew-resize; /* indicates left/right movement */
+}
+
+.field-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(30,90,55,0.7) 0%, rgba(17,24,39,0.8) 100%);
+  pointer-events: none;
+}
+
+.track-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10%;
+}
+
+.track-point {
+  z-index: 10;
+  color: var(--white);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.point-label {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hand-icon {
+  color: #fbbf24; /* subtle gold/yellow */
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.moving-onion-wrapper {
+  position: absolute;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  transition: left 0.1s ease-out, transform 0.1s ease-out;
+  z-index: 20;
+  pointer-events: none; /* so mouse events pass through to container */
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+}
+
+.moving-onion {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%; /* masks the white background into a perfect circle */
+  /* mix-blend-mode: multiply; -> alternatively, but border-radius is cleaner for a round onion */
+}
+
+@media (max-width: 768px) {
+  .interactive-field {
+    height: 300px;
+  }
+  .moving-onion-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+  .point-label {
+    font-size: 1rem;
+  }
+  .hand-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
