@@ -1,5 +1,6 @@
 import React from 'react';
 import { Globe } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 import './Footer.css';
 
 const Footer = () => {
@@ -9,7 +10,7 @@ const Footer = () => {
         <div className="footer-grid">
           <div className="footer-brand">
             <div className="logo mb-3">
-              <Globe className="logo-icon" size={28} />
+              <img src={logoImg} alt="Aanoor Global Exports" className="logo-img" style={{ height: '40px', width: 'auto', marginRight: '10px' }} />
               <span className="logo-text">Aanoor Global Exports</span>
             </div>
             <p className="footer-slogan">Where Trust Moves Markets.</p>

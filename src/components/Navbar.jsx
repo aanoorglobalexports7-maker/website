@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -31,7 +32,7 @@ const Navbar = () => {
     <header className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container nav-container">
         <Link to="/" className="logo">
-          <Globe className="logo-icon" size={28} />
+          <img src={logoImg} alt="Aanoor Global Exports" className="logo-img" />
           <span className="logo-text">Aanoor Global Exports</span>
         </Link>
 
