@@ -1,39 +1,113 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { ArrowRight, Globe, Users, ShieldCheck, ChevronDown } from 'lucide-react';
 import './Hero.css';
-import heroImg from '../assets/hero.png';
-import { ShieldCheck, PackageCheck, Globe2, Truck } from 'lucide-react';
 
 const Hero = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const scrollToProducts = () => {
+    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToContact = () => {
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <section id="home" className="hero" style={{ backgroundImage: `url(${heroImg})` }}>
+    <section className="hero-section relative overflow-hidden" id="home">
+      <div className="hero-image-bg"></div>
       <div className="hero-overlay"></div>
-      <div className="container hero-content">
-        <h1 className="fade-up visible">Premium Agricultural Exports from India</h1>
-        <p className="hero-subtitle fade-up visible" style={{ transitionDelay: '0.1s' }}>
-          Delivering trusted agricultural products to global markets with uncompromising quality, reliable sourcing, and long-term business partnerships.
-        </p>
-        <div className="hero-actions fade-up visible" style={{ transitionDelay: '0.2s' }}>
-          <a href="#contact" className="btn-primary">Request a Quote</a>
-          <a href="#contact" className="btn-outline">Contact Us</a>
+      <div className="hero-pattern" aria-hidden="true"></div>
+      
+      <div className="hero-split-container">
+        <div className={`hero-left ${isVisible ? 'visible' : ''}`}>
+          <div className="hero-eyebrow">🌿 Trusted by 1000+ Partners Worldwide</div>
+          <h1 className="hero-main-title">
+            South India's Premier Trade & Sourcing Company
+            <span className="hero-highlight-text">Export Solutions</span>
+          </h1>
+          <p className="hero-main-subtitle">
+            Seamless sourcing, trade & market expansion — from South India to the world.
+          </p>
+          
+          <div className="hero-cta-group">
+            <button onClick={scrollToProducts} className="hero-btn hero-btn-primary">
+              Explore Products <ArrowRight className="hero-btn-icon" />
+            </button>
+            <button onClick={scrollToContact} className="hero-btn hero-btn-secondary">
+              Contact Us
+            </button>
+          </div>
+          
+          <div className="hero-stats-strip">
+            <div className="hero-stat-item">
+              <span className="hero-stat-value">50+</span>
+              <span className="hero-stat-label">Countries Served</span>
+            </div>
+            <div className="hero-stat-item">
+              <span className="hero-stat-value">1000+</span>
+              <span className="hero-stat-label">Partners Worldwide</span>
+            </div>
+            <div className="hero-stat-item">
+              <span className="hero-stat-value">99.8%</span>
+              <span className="hero-stat-label">On-time Delivery</span>
+            </div>
+            <div className="hero-stat-item">
+              <span className="hero-stat-value">24/7</span>
+              <span className="hero-stat-label">Support</span>
+            </div>
+          </div>
         </div>
-        
-        <div className="hero-features fade-up visible" style={{ transitionDelay: '0.3s' }}>
-          <div className="feature">
-            <ShieldCheck size={20} />
-            <span>Trusted Export Partner</span>
+
+        <div className={`hero-right ${isVisible ? 'visible' : ''}`}>
+          <div className="hero-stats-dock">
+            <div className="hero-stats-card hero-stats-card--left float-anim-1">
+              <div className="hero-stats-card-inner">
+                <div className="hero-stats-icon-box">
+                  <Globe className="hero-stats-icon" />
+                </div>
+                <div className="hero-stats-info">
+                  <span className="hero-stats-number">50+</span>
+                  <span className="hero-stats-label">Countries Served</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="hero-stats-card hero-stats-card--right float-anim-2">
+              <div className="hero-stats-card-inner">
+                <div className="hero-stats-icon-box">
+                  <Users className="hero-stats-icon" />
+                </div>
+                <div className="hero-stats-info">
+                  <span className="hero-stats-number">1000+</span>
+                  <span className="hero-stats-label">Global Partners</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="hero-stats-card hero-stats-card--left float-anim-3">
+              <div className="hero-stats-card-inner">
+                <div className="hero-stats-icon-box">
+                  <ShieldCheck className="hero-stats-icon" />
+                </div>
+                <div className="hero-stats-info">
+                  <span className="hero-stats-number">99.8%</span>
+                  <span className="hero-stats-label">On-Time Delivery</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="feature">
-            <PackageCheck size={20} />
-            <span>Quality Assured</span>
-          </div>
-          <div className="feature">
-            <Globe2 size={20} />
-            <span>Global Shipping</span>
-          </div>
-          <div className="feature">
-            <Truck size={20} />
-            <span>Timely Delivery</span>
-          </div>
+        </div>
+      </div>
+
+      <div className="hero-scroll-indicator">
+        <span className="hero-scroll-text">Scroll to explore</span>
+        <div className="scroll-arrow-anim">
+          <ChevronDown className="hero-scroll-arrow" />
         </div>
       </div>
     </section>

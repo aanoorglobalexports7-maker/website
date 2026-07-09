@@ -1,8 +1,61 @@
-import React from 'react';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Phone, Mail, Clock, CheckCircle2 } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 import './Contact.css';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    companyName: '',
+    email: '',
+    phone: '',
+    country: '',
+    product: '',
+    quantity: '',
+    message: ''
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      await addDoc(collection(db, 'enquiries'), {
+        ...formData,
+        createdAt: serverTimestamp()
+      });
+      
+      setIsSuccess(true);
+      setFormData({
+        fullName: '',
+        companyName: '',
+        email: '',
+        phone: '',
+        country: '',
+        product: '',
+        quantity: '',
+        message: ''
+      });
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => setIsSuccess(false), 5000);
+    } catch (error) {
+      console.error("Error submitting form: ", error);
+      alert("There was an error sending your enquiry. Please try again or contact us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="section">
       <div className="container contact-container">
@@ -70,37 +123,44 @@ const Contact = () => {
           <h3>Send us an Enquiry</h3>
           <p className="mb-4">Fill out the form below and our team will get back to you promptly.</p>
           
-          <form className="contact-form">
+          {isSuccess && (
+            <div className="success-message" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#dcfce7', color: '#166534', padding: '1rem', borderRadius: '6px', marginBottom: '1.5rem' }}>
+              <CheckCircle2 size={20} />
+              <span>Thank you! Your enquiry has been sent successfully.</span>
+            </div>
+          )}
+          
+          <form className="contact-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Full Name</label>
-                <input type="text" className="form-input" placeholder="John Doe" required />
+                <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="form-input" placeholder="John Doe" required />
               </div>
               <div className="form-group">
                 <label className="form-label">Company Name</label>
-                <input type="text" className="form-input" placeholder="Global Imports LLC" required />
+                <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} className="form-input" placeholder="Global Imports LLC" required />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Email Address</label>
-                <input type="email" className="form-input" placeholder="john@example.com" required />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} className="form-input" placeholder="john@example.com" required />
               </div>
               <div className="form-group">
                 <label className="form-label">WhatsApp / Phone Number</label>
-                <input type="tel" className="form-input" placeholder="+1 234 567 8900" required />
+                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="form-input" placeholder="+1 234 567 8900" required />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Country</label>
-                <input type="text" className="form-input" placeholder="United States" required />
+                <input type="text" name="country" value={formData.country} onChange={handleChange} className="form-input" placeholder="United States" required />
               </div>
               <div className="form-group">
                 <label className="form-label">Product Interested In</label>
-                <select className="form-select" required>
+                <select name="product" value={formData.product} onChange={handleChange} className="form-select" required>
                   <option value="">Select a Product</option>
                   <option value="Spices">Premium Spices</option>
                   <option value="Coconuts">Coconut Products</option>
@@ -117,15 +177,17 @@ const Contact = () => {
 
             <div className="form-group">
               <label className="form-label">Quantity Required</label>
-              <input type="text" className="form-input" placeholder="e.g. 1x20ft Container / 10 Metric Tons" required />
+              <input type="text" name="quantity" value={formData.quantity} onChange={handleChange} className="form-input" placeholder="e.g. 1x20ft Container / 10 Metric Tons" required />
             </div>
 
             <div className="form-group">
               <label className="form-label">Message</label>
-              <textarea className="form-textarea" placeholder="Please provide any specific requirements..." required></textarea>
+              <textarea name="message" value={formData.message} onChange={handleChange} className="form-textarea" placeholder="Please provide any specific requirements..." required></textarea>
             </div>
 
-            <button type="submit" className="btn-primary w-100">Send Enquiry</button>
+            <button type="submit" className="btn-primary w-100" disabled={isSubmitting} style={{ opacity: isSubmitting ? 0.7 : 1 }}>
+              {isSubmitting ? 'Sending...' : 'Send Enquiry'}
+            </button>
           </form>
         </div>
 
