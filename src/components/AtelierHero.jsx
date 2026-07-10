@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Play, ShieldCheck, Package, Globe, Truck, X } from 'lucide-react';
 
-const AtelierHero = () => {
+const AtelierHero = ({ openQuoteModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Prevent scrolling when menu is open
@@ -17,12 +17,21 @@ const AtelierHero = () => {
   }, [isMenuOpen]);
 
   const menuLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Services', href: '#services' },
-    { name: 'Products', href: '#products' },
-    { name: 'Contact Us', href: '#contact' }
+    { name: 'Home', id: 'home' },
+    { name: 'About', id: 'about' },
+    { name: 'Services', id: 'services' },
+    { name: 'Products', id: 'products' },
+    { name: 'Contact Us', id: 'contact' }
   ];
+
+  const handleNavClick = (e, targetId) => {
+    e.preventDefault();
+    setIsMenuOpen(false);
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section id="home" className="w-full h-[100dvh] overflow-hidden relative bg-black">
@@ -51,19 +60,19 @@ const AtelierHero = () => {
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1.5">
-            <a href="#home" className="bg-[#dcfce7] text-[#16a34a] border border-[#bbf7d0] px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-sm">
+            <a href="#home" onClick={(e) => handleNavClick(e, 'home')} className="bg-[#dcfce7] text-[#16a34a] border border-[#bbf7d0] px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-sm">
               Home
             </a>
-            <a href="#about" className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
               About
             </a>
-            <a href="#services" className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            <a href="#services" onClick={(e) => handleNavClick(e, 'services')} className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
               Services
             </a>
-            <a href="#products" className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            <a href="#products" onClick={(e) => handleNavClick(e, 'products')} className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
               Products
             </a>
-            <a href="#contact" className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-medium transition-colors">
               Contact Us
             </a>
           </div>
@@ -104,11 +113,11 @@ const AtelierHero = () => {
           </p>
           
           <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center gap-5">
-            <a href="#contact" className="group flex items-center justify-center gap-2 bg-white text-black rounded-full px-8 py-3.5 text-sm md:text-base font-semibold hover:bg-white/90 transition-all hover:scale-105 shadow-xl">
+            <button onClick={openQuoteModal} className="group flex items-center justify-center gap-2 bg-white text-black rounded-full px-8 py-3.5 text-sm md:text-base font-semibold hover:bg-white/90 transition-all hover:scale-105 shadow-xl">
               Request a Quote
               <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
-            <a href="#contact" className="group flex items-center justify-center gap-2 bg-black/30 backdrop-blur-md border border-white/40 text-white rounded-full px-8 py-3.5 text-sm md:text-base font-semibold hover:bg-black/50 hover:border-white/80 transition-all duration-300 shadow-xl hover:scale-105">
+            </button>
+            <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="group flex items-center justify-center gap-2 bg-black/30 backdrop-blur-md border border-white/40 text-white rounded-full px-8 py-3.5 text-sm md:text-base font-semibold hover:bg-black/50 hover:border-white/80 transition-all duration-300 shadow-xl hover:scale-105">
               Contact Us
               <Play size={18} className="fill-transparent" />
             </a>
@@ -157,8 +166,8 @@ const AtelierHero = () => {
             {menuLinks.map((link, index) => (
               <a
                 key={link.name}
-                href={link.href}
-                onClick={() => setIsMenuOpen(false)}
+                href={`#${link.id}`}
+                onClick={(e) => handleNavClick(e, link.id)}
                 className="group border-b border-white/10 py-5 overflow-hidden block"
               >
                 <div

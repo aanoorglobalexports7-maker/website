@@ -58,7 +58,7 @@ const products = [
   }
 ];
 
-const Products = () => {
+const Products = ({ openQuoteModal }) => {
   const container = useRef(null);
   const cardRefs = useRef([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -283,13 +283,17 @@ const Products = () => {
                 </div>
                 
                 <div className="mt-10 pt-6 border-t border-slate-100">
-                  <a 
-                    href="#contact" 
-                    onClick={() => setSelectedProduct(null)}
+                  <button 
+                    type="button"
+                    onClick={(e) => { 
+                      e.preventDefault();
+                      setSelectedProduct(null);
+                      openQuoteModal(e);
+                    }}
                     className="w-full md:w-auto inline-flex justify-center items-center gap-2 bg-[#16a34a] text-white px-8 py-3.5 rounded-full font-bold shadow-lg shadow-green-900/20 hover:bg-[#15803d] transition-colors"
                   >
                     Request a Quote
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

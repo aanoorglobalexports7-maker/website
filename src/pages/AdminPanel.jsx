@@ -29,7 +29,7 @@ const AdminPanel = () => {
       if (!user) return; // Don't fetch if not logged in
       
       try {
-        const q = query(collection(db, 'enquiries'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         const data = querySnapshot.docs.map(doc => ({
           id: doc.id,
@@ -49,7 +49,7 @@ const AdminPanel = () => {
   const handleToggleRead = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === 'read' ? 'unread' : 'read';
-      await updateDoc(doc(db, 'enquiries', id), { status: newStatus });
+      await updateDoc(doc(db, 'inquiries', id), { status: newStatus });
       setEnquiries(prev => prev.map(enq => enq.id === id ? { ...enq, status: newStatus } : enq));
     } catch (error) {
       console.error("Error updating status:", error);
@@ -59,7 +59,7 @@ const AdminPanel = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this enquiry? This action cannot be undone.")) {
       try {
-        await deleteDoc(doc(db, 'enquiries', id));
+        await deleteDoc(doc(db, 'inquiries', id));
         setEnquiries(prev => prev.filter(enq => enq.id !== id));
       } catch (error) {
         console.error("Error deleting enquiry:", error);
@@ -87,20 +87,20 @@ const AdminPanel = () => {
   return (
     <div className="admin-layout">
       <header className="admin-header">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="admin-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2>Aanoor Global Exports - Admin Panel</h2>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button 
               onClick={() => navigate('/')} 
-              className="btn-outline" 
+              className="admin-btn-outline" 
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
             >
               <ArrowLeft size={16} /> Back to Website
             </button>
             <button 
               onClick={handleSignOut} 
-              className="btn-primary"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: '#dc2626', borderColor: '#dc2626' }}
+              className="admin-btn-danger"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
             >
               <LogOut size={16} /> Sign Out
             </button>
@@ -108,7 +108,7 @@ const AdminPanel = () => {
         </div>
       </header>
       
-      <main className="admin-main container">
+      <main className="admin-container">
         <div className="admin-card">
           <div className="admin-card-header">
             <h3>Recent Enquiries</h3>
@@ -128,11 +128,11 @@ const AdminPanel = () => {
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Client</th>
-                    <th>Contact</th>
-                    <th>Product & Qty</th>
-                    <th>Location</th>
-                    <th>Message</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Country</th>
+                    <th>Requirements</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -146,30 +146,25 @@ const AdminPanel = () => {
                         {enq.createdAt ? new Date(enq.createdAt.toDate()).toLocaleDateString() : 'N/A'}
                       </td>
                       <td>
-                        <strong>{enq.fullName}</strong>
-                        <div className="text-small text-gray">{enq.companyName}</div>
+                        <strong>{enq.name}</strong>
                       </td>
                       <td>
                         <div className="contact-cell">
                           <Mail size={14} /> <a href={`mailto:${enq.email}`}>{enq.email}</a>
                         </div>
+                      </td>
+                      <td>
                         <div className="contact-cell">
                           <Phone size={14} /> <a href={`tel:${enq.phone}`}>{enq.phone}</a>
                         </div>
                       </td>
                       <td>
-                        <div className="product-badge">
-                          <Box size={14} /> {enq.product || 'N/A'}
-                        </div>
-                        <div className="text-small">Qty: {enq.quantity || 'N/A'}</div>
-                      </td>
-                      <td>
                         <div className="contact-cell">
-                          <MapPin size={14} /> {enq.country}
+                          <MapPin size={14} /> {enq.country || 'N/A'}
                         </div>
                       </td>
                       <td className="message-cell">
-                        {enq.message}
+                        {enq.requirements}
                       </td>
                       <td>
                         <div className="action-buttons">
