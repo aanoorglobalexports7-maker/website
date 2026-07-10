@@ -1,67 +1,39 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ArrowRight, X, ShieldCheck, Package, Globe } from 'lucide-react';
+import { ArrowRight, X, ShieldCheck, Package, Globe, Layers } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ReactLenis } from 'lenis/react';
-import onionImg from '../assets/real_onion.jpg';
-import chillyImg from '../assets/real_chilly.jpg';
-import drumstickImg from '../assets/real_drumstick.jpg';
-import turmericImg from '../assets/real_turmeric.jpg';
-import milletsImg from '../assets/real_millets.jpg';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
-const products = [
-  {
-    id: 1,
-    title: 'Big Onion',
-    description: 'Premium export-quality big onions, carefully sorted and packed to ensure freshness and long shelf life.',
-    image: onionImg,
-    qualityAssurance: 'Sourced from GAP-certified farms. Hand-sorted for uniform size (45mm - 60mm+), optimal moisture content, and extended shelf-life. Free from sprouting and mechanical damage.',
-    packagingDetails: 'Mesh bags (5kg, 10kg, 25kg, 50kg) or as per buyer\'s requirement. Ventilated containers used for sea freight.',
-    globalShipping: 'We partner with leading freight forwarders to ensure timely delivery via sea or air freight to any major port worldwide. Customs clearance documentation is fully handled by our expert team.'
-  },
-  {
-    id: 2,
-    title: 'Red Chilly',
-    description: 'Vibrant and pungent dried red chilies, sourced directly from the finest farms in India.',
-    image: chillyImg,
-    qualityAssurance: 'Sun-dried to perfection to maintain a moisture level below 12%. High ASTA color value and strict pungency checks (SHU tailored to buyer). Guaranteed free from aflatoxins.',
-    packagingDetails: 'New Jute Bags / PP Bags (10kg, 25kg). Vacuum packing available for premium retention.',
-    globalShipping: 'We partner with leading freight forwarders to ensure timely delivery via sea or air freight to any major port worldwide. Customs clearance documentation is fully handled by our expert team.'
-  },
-  {
-    id: 3,
-    title: 'Drumstick',
-    description: 'Fresh green drumsticks (Moringa pods), rich in nutrients and carefully bundled for global export.',
-    image: drumstickImg,
-    qualityAssurance: 'Harvested at peak tenderness. Sorted for straightness, uniform length (45cm - 60cm), and vibrant green color. Packed in ventilated corrugated boxes to ensure freshness.',
-    packagingDetails: '5kg to 10kg corrugated boxes with proper ventilation holes for air circulation during air freight.',
-    globalShipping: 'We partner with leading freight forwarders to ensure timely delivery via sea or air freight to any major port worldwide. Customs clearance documentation is fully handled by our expert team.'
-  },
-  {
-    id: 4,
-    title: 'Turmeric',
-    description: 'High-curcumin whole turmeric roots and pure ground turmeric powder, processed under strict quality controls.',
-    image: turmericImg,
-    qualityAssurance: 'High curcumin content (2% - 5%+). Mechanically polished, visually inspected, and laboratory-tested for heavy metals and pesticide residues. 100% natural.',
-    packagingDetails: '25kg / 50kg PP bags for fingers/roots. Multi-layer paper bags for powder to prevent moisture ingress.',
-    globalShipping: 'We partner with leading freight forwarders to ensure timely delivery via sea or air freight to any major port worldwide. Customs clearance documentation is fully handled by our expert team.'
-  },
-  {
-    id: 5,
-    title: 'Millets',
-    description: 'Nutrient-dense premium millets, properly cleaned and packaged to meet international food safety standards.',
-    image: milletsImg,
-    qualityAssurance: 'Processed in ISO-certified facilities. Double machine-cleaned and color-sorted for 99.9% purity. Vacuum-packed to prevent moisture and pest infestation.',
-    packagingDetails: '25kg / 50kg PP bags. Retail vacuum packaging available upon request.',
-    globalShipping: 'We partner with leading freight forwarders to ensure timely delivery via sea or air freight to any major port worldwide. Customs clearance documentation is fully handled by our expert team.'
-  }
-];
 
 const Products = ({ openQuoteModal }) => {
   const container = useRef(null);
   const cardRefs = useRef([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products from Firestore
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'asc'));
+        const querySnapshot = await getDocs(q);
+        const fetchedProducts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -79,10 +51,10 @@ const Products = ({ openQuoteModal }) => {
     () => {
       gsap.registerPlugin(ScrollTrigger);
 
-      const cardElements = cardRefs.current;
+      const cardElements = cardRefs.current.filter(el => el != null);
       const totalCards = cardElements.length;
 
-      if (!cardElements[0]) return;
+      if (loading || totalCards === 0) return;
 
       // Set initial positions
       gsap.set(cardElements[0], { y: "0%", scale: 1, rotation: 0 });
@@ -146,8 +118,16 @@ const Products = ({ openQuoteModal }) => {
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       };
     },
-    { scope: container }
+    { scope: container, dependencies: [products, loading] }
   );
+
+  if (loading) {
+    return (
+      <section id="products" className="w-full h-screen bg-white flex items-center justify-center">
+        <div className="text-xl font-outfit text-emerald-700 animate-pulse">Loading Premium Products...</div>
+      </section>
+    );
+  }
 
   return (
     <ReactLenis root>
@@ -251,35 +231,58 @@ const Products = ({ openQuoteModal }) => {
                 <p className="text-slate-600 font-sans mb-8 leading-relaxed border-b border-slate-100 pb-6">{selectedProduct.description}</p>
                 
                 <div className="space-y-8 font-sans">
-                  <div className="flex gap-4">
-                    <div className="mt-1 w-10 h-10 shrink-0 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center">
-                      <ShieldCheck size={20} />
+                  {selectedProduct.qualityAssurance && (
+                    <div className="flex gap-4">
+                      <div className="mt-1 w-10 h-10 shrink-0 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center">
+                        <ShieldCheck size={20} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-2">Quality Assurance</h3>
+                        <p className="text-slate-600 text-[15px] leading-relaxed">{selectedProduct.qualityAssurance}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-800 mb-2">Quality Assurance</h3>
-                      <p className="text-slate-600 text-[15px] leading-relaxed">{selectedProduct.qualityAssurance}</p>
-                    </div>
-                  </div>
+                  )}
                   
-                  <div className="flex gap-4">
-                    <div className="mt-1 w-10 h-10 shrink-0 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center">
-                      <Package size={20} />
+                  {selectedProduct.packagingDetails && (
+                    <div className="flex gap-4">
+                      <div className="mt-1 w-10 h-10 shrink-0 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center">
+                        <Package size={20} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-2">Packaging Details</h3>
+                        <p className="text-slate-600 text-[15px] leading-relaxed">{selectedProduct.packagingDetails}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-800 mb-2">Packaging Details</h3>
-                      <p className="text-slate-600 text-[15px] leading-relaxed">{selectedProduct.packagingDetails}</p>
+                  )}
+                  {selectedProduct.globalShipping && (
+                    <div className="flex gap-4">
+                      <div className="mt-1 w-10 h-10 shrink-0 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center">
+                        <Globe size={20} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-2">Global Shipping</h3>
+                        <p className="text-slate-600 text-[15px] leading-relaxed">{selectedProduct.globalShipping}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
-                  <div className="flex gap-4">
-                    <div className="mt-1 w-10 h-10 shrink-0 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center">
-                      <Globe size={20} />
+                  {selectedProduct.variants && (
+                    <div className="flex gap-4">
+                      <div className="mt-1 w-10 h-10 shrink-0 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center">
+                        <Layers size={20} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-2">Available Variants / Sizes</h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {selectedProduct.variants.split(',').map((variant, idx) => (
+                            <span key={idx} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-sm font-medium border border-slate-200">
+                              {variant.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-800 mb-2">Global Shipping</h3>
-                      <p className="text-slate-600 text-[15px] leading-relaxed">{selectedProduct.globalShipping}</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
                 
                 <div className="mt-10 pt-6 border-t border-slate-100">
